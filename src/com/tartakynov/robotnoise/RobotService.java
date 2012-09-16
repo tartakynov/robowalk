@@ -14,8 +14,6 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.hardware.SensorManager;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -34,13 +32,11 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
 	private NotificationManager mNotificationManager;
 	private SensorManager mSensorManager;    
 	private PowerManager mPowerManager;
-	private AudioManager mAudioManager;
 	private PowerManager.WakeLock mWakeLock;
 
     private LegMovementDetector mLegMovementDetector;    
     private ILegMovementListener mLegMovementActivityCallback;	
-	private MediaPlayer mPlayForward;
-	private MediaPlayer mPlayBackward;	
+	private LegMovementPlayer mPlayer;
 	private final IBinder mBinder = new RobotBinder();
 	
 	private static boolean sIsRunning = false;
@@ -64,16 +60,12 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
         this.mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);		
     	this.mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
     	this.mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-    	this.mAudioManager = (AudioManager)getSystemService(AUDIO_SERVICE); 
+        this.mPlayer = new LegMovementPlayer(getApplicationContext());
     	
 		// initialize wakelock
         this.mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK);
         this.mWakeLock.acquire();    	
-
-		// initialize sound
-		this.mPlayForward = MediaPlayer.create(getApplicationContext(), R.raw.forward);
-		this.mPlayBackward = MediaPlayer.create(getApplicationContext(), R.raw.backward);
-		
+        
 		// initialize movement detector
         this.mLegMovementDetector = new LegMovementDetector(mSensorManager);
         this.mLegMovementDetector.addListener(mLegMovementListener);
@@ -89,9 +81,8 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
     public void onDestroy() {
     	sIsRunning = false;
     	this.mLegMovementDetector.stopDetector();
-    	this.mNotificationManager.cancel(NOTIFICATION);
-    	this.mPlayBackward.release();
-    	this.mPlayForward.release();
+    	this.mNotificationManager.cancel(NOTIFICATION);    		
+    	this.mPlayer.release(); 
     	this.mWakeLock.release();
     }        
     
@@ -103,17 +94,17 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
 	@Override
 	public void onPreferenceChanged(Preferences pref) {
 		Log.i(LOG_TAG, "onPreferenceChanged");
-		this.mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC,pref.getVolume(), 0);		
+		this.mPlayer.setVolume(pref.getVolume());
 	}
-
+	
 	public boolean start() {
 		if (this.mLegMovementDetector == null) { // just to be on safe side
 			return false;
 		}
 		this.mLegMovementDetector.startDetector();
 		return true;
-	}
-	
+	}	
+
 	/**
      * Show a notification while this service is running.
      */
@@ -128,20 +119,20 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
     }
     
     private ILegMovementListener mLegMovementListener = new ILegMovementListener() {
-		@Override
-		public void onLegActivity(int activity) {
-			if (RobotService.this.mLegMovementActivityCallback != null) {
-				RobotService.this.mLegMovementActivityCallback.onLegActivity(activity);
-			}
-			switch (activity) {
-			case LegMovementDetector.LEG_MOVEMENT_BACKWARD:
-				RobotService.this.mPlayBackward.start();
-				break;
-			case LegMovementDetector.LEG_MOVEMENT_FORWARD:
-				RobotService.this.mPlayForward.start();
-				break;
-			}
-		}    	
+    	@Override
+    	public void onLegActivity(int activity) {
+    		if (RobotService.this.mLegMovementActivityCallback != null) {
+    			RobotService.this.mLegMovementActivityCallback.onLegActivity(activity);
+    		}
+    		switch (activity) {
+    		case LegMovementDetector.LEG_MOVEMENT_BACKWARD:
+    			mPlayer.playBackward();
+    			break;
+    		case LegMovementDetector.LEG_MOVEMENT_FORWARD:
+    			mPlayer.playForward();
+    			break;
+    		}									
+    	}   	
     };
     
     public void setListener(ILegMovementListener callback) {

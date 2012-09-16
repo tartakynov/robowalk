@@ -65,7 +65,7 @@ public class MainActivity extends Activity {
 		    int keyCode = event.getKeyCode();
 		    switch (keyCode) {
 	        case KeyEvent.KEYCODE_VOLUME_UP:
-	            if (action == KeyEvent.ACTION_UP) {
+	            if ((action == KeyEvent.ACTION_UP) && (volume < 20)) {
 	            	pref.setVolume(volume + 1);	            	
 	            	mStatusText.setText("" + (volume + 1));
 	            }
