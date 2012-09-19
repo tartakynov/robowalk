@@ -14,12 +14,13 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 public class MainActivity extends Activity {
 	public static final String LOG_TAG = "MainActivity";
 	
-	private TextView mStatusText;
 	private RobotService mService;
 	private boolean mIsServiceBound = false;
 		
@@ -27,7 +28,7 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
         setContentView(R.layout.activity_main);        
-        this.mStatusText = (TextView)findViewById(R.id.statusText);
+        //this.mStatusText = (TextView)findViewById(R.id.statusText);
     	doStartService();
 		doBindService();
 	}
@@ -67,18 +68,21 @@ public class MainActivity extends Activity {
 	        case KeyEvent.KEYCODE_VOLUME_UP:
 	            if ((action == KeyEvent.ACTION_UP) && (volume < 20)) {
 	            	pref.setVolume(volume + 1);	            	
-	            	mStatusText.setText("" + (volume + 1));
 	            }
 	            return true;
 	        case KeyEvent.KEYCODE_VOLUME_DOWN:
 	            if ((action == KeyEvent.ACTION_DOWN) && (volume > 0)) {
 	            	pref.setVolume(volume - 1);
-	            	mStatusText.setText("" + (volume - 1));
 	            }
 	            return true;
 	        }	    	
 	    }
         return super.dispatchKeyEvent(event);
+	}
+	
+	public void onPowerButtonClick(View view) {
+		Button btn = (Button)view;
+		btn.setActivated(!btn.isActivated());
 	}
 	
 	/******************* Working with RobotService ********************/
@@ -150,13 +154,10 @@ public class MainActivity extends Activity {
 		public void onLegActivity(int activity) {
 			switch (activity) {
 			case LegMovementDetector.LEG_MOVEMENT_NONE:
-				MainActivity.this.mStatusText.setText("Stopped");
 				break;
 			case LegMovementDetector.LEG_MOVEMENT_BACKWARD:
-				MainActivity.this.mStatusText.setText("Backward");
 				break;
 			case LegMovementDetector.LEG_MOVEMENT_FORWARD:
-				MainActivity.this.mStatusText.setText("Forward");
 				break;
 			}
 		}

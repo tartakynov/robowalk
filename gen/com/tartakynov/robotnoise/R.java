@@ -11,12 +11,21 @@ public final class R {
     public static final class attr {
     }
     public static final class drawable {
-        public static final int ic_action_search=0x7f020000;
-        public static final int ic_launcher=0x7f020001;
+        public static final int background=0x7f020000;
+        public static final int ic_action_search=0x7f020001;
+        public static final int ic_launcher=0x7f020002;
+        public static final int pb_active=0x7f020003;
+        public static final int pb_normal=0x7f020004;
+        public static final int pb_pressed=0x7f020005;
+        public static final int power_button=0x7f020006;
+        public static final int seekbar_bg=0x7f020007;
+        public static final int seekbar_progress=0x7f020008;
+        public static final int seekbar_progress_bg=0x7f020009;
+        public static final int seekbar_stripe=0x7f02000a;
     }
     public static final class id {
+        public static final int button1=0x7f080000;
         public static final int menu_quit=0x7f080001;
-        public static final int statusText=0x7f080000;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
