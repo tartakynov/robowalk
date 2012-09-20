@@ -5,5 +5,6 @@
     <string name="title_activity_main">Звуки робота</string>
     <string name="robot_service_label">Звуки робота</string>
     <string name="robot_service_text">Издает звуки робота когда вы ходите</string>
+    <string name="robot_power_on">Положите телефон в карман</string>
 
 </resources>

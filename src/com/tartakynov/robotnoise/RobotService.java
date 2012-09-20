@@ -37,7 +37,8 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
     private PowerManager.WakeLock mWakeLock;
     private LegMovementDetector mLegMovementDetector;    
     private LegMovementPlayer mPlayer;
-
+    private boolean mIsStarted = false;
+    
     public class RobotBinder extends Binder {
 	RobotService getService() {
 	    return RobotService.this;
@@ -50,6 +51,7 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
     private ILegMovementListener mLegMovementListener = new ILegMovementListener() {
 	@Override
 	public void onLegActivity(int activity) {
+	    if (!mIsStarted) return;
 	    switch (activity) {
 	    case LegMovementDetector.LEG_MOVEMENT_BACKWARD:
 		mPlayer.playBackward();
@@ -117,20 +119,30 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
 
     /********************* Public methods*******************************/
 
-    public boolean start() {
-	if (this.mLegMovementDetector == null) { // just to be on safe side
-	    return false;
+    public void startDetector() {
+	if (this.mLegMovementDetector != null) { // just to be on safe side
+	    this.mLegMovementDetector.startDetector();
 	}
-	this.mLegMovementDetector.startDetector();
-	return true;
     }	
 
-    public void stop() {
+    public void stopDetector() {
 	if (mLegMovementDetector != null) {
 	    this.mLegMovementDetector.stopDetector();			
 	}
     }
     
+    public boolean isStarted() {
+	return mIsStarted;
+    }
+    
+    public void start() {
+	mIsStarted = true;	
+    }
+
+    public void stop() {
+	mIsStarted = false;	
+    }
+
     public static boolean isRunning() {
 	return sIsRunning;
     }

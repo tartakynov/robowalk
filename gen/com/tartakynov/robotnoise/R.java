@@ -18,10 +18,12 @@ public final class R {
         public static final int pb_normal=0x7f020004;
         public static final int pb_pressed=0x7f020005;
         public static final int power_button=0x7f020006;
+        public static final int volume_background=0x7f020007;
     }
     public static final class id {
-        public static final int button1=0x7f080000;
-        public static final int menu_quit=0x7f080001;
+        public static final int button_power=0x7f080001;
+        public static final int imageView1=0x7f080000;
+        public static final int menu_quit=0x7f080002;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
@@ -36,6 +38,7 @@ public final class R {
     public static final class string {
         public static final int app_name=0x7f050000;
         public static final int menu_quit=0x7f050001;
+        public static final int robot_power_on=0x7f050005;
         public static final int robot_service_label=0x7f050003;
         public static final int robot_service_text=0x7f050004;
         public static final int title_activity_main=0x7f050002;

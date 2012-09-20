@@ -16,6 +16,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 import android.hardware.SensorManager;
 
 public class MainActivity extends Activity {
@@ -24,19 +25,23 @@ public class MainActivity extends Activity {
 
     private RobotService mService;
     private PocketDetector mPocket;
+    private Vibrator mVibrator;
     private boolean mIsServiceBound = false;
-
+    private Button mPowerButton;
+    
     /********************* Activity ************************************/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);		
-	setContentView(R.layout.activity_main);        		
+	setContentView(R.layout.activity_main);
 	doStartService();
 	doBindService();
+	mPowerButton = (Button)findViewById(R.id.button_power);
+	mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);		 	
 	mPocket = new PocketDetector((SensorManager) getSystemService(SENSOR_SERVICE));
 	mPocket.registerListener(mPocketDetectorListener);
-	mPocket.start();
+	mPocket.start();	
     }
 
     @Override
@@ -99,10 +104,19 @@ public class MainActivity extends Activity {
      * Power button click handler
      */
     public void onPowerButtonClick(View view) {
-	Button btn = (Button)view;
-	btn.setSelected(!btn.isSelected());
-	Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);		 
-	v.vibrate(75);
+	Button btn = (Button)view;	
+	if (mService != null) {
+	    if (mService.isStarted()) {
+		mService.stop();
+	    } else {
+		mService.start();		
+		Toast.makeText(this, R.string.robot_power_on, Toast.LENGTH_SHORT).show();
+	    }
+	    btn.setSelected(mService.isStarted());
+	    if (mVibrator != null) {
+		mVibrator.vibrate(75);
+	    }
+	}
     }
 
     /******************* Working with RobotService ********************/
@@ -112,6 +126,7 @@ public class MainActivity extends Activity {
 	public void onServiceConnected(ComponentName className, IBinder service) {
 	    Log.i(LOG_TAG, "Service connected");
 	    mService = ((RobotService.RobotBinder)service).getService();
+	    mPowerButton.setSelected(mService.isStarted());
 	}
 
 	@Override
@@ -173,7 +188,7 @@ public class MainActivity extends Activity {
 	 */
 	public void phoneInPocket() {
 	    if (mService != null) {
-		mService.start();
+		mService.startDetector();
 	    }
 	}
 
@@ -182,7 +197,7 @@ public class MainActivity extends Activity {
 	 */
 	public void phoneOutOfPocket() {
 	    if (mService != null) {
-		mService.stop();
+		mService.stopDetector();
 	    }
 	}
     };
