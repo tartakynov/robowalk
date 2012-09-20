@@ -1,10 +1,10 @@
 package com.tartakynov.robotnoise;
 
-import com.tartakynov.robotnoise.leg.ILegMovementListener;
-import com.tartakynov.robotnoise.leg.LegMovementDetector;
+import com.tartakynov.robotnoise.PocketDetector.IInPocketListener;
 
 import android.os.Bundle;
 import android.os.IBinder;
+import android.os.Vibrator;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -16,26 +16,33 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
+import android.hardware.SensorManager;
 
 public class MainActivity extends Activity {
+
 	public static final String LOG_TAG = "MainActivity";
 	
 	private RobotService mService;
+	private PocketDetector mPocket;
 	private boolean mIsServiceBound = false;
 		
+	/********************* Activity ************************************/
+
 	@Override
     public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);		
-        setContentView(R.layout.activity_main);        
-        //this.mStatusText = (TextView)findViewById(R.id.statusText);
+        setContentView(R.layout.activity_main);        		
     	doStartService();
 		doBindService();
+		mPocket = new PocketDetector((SensorManager) getSystemService(SENSOR_SERVICE));
+		mPocket.registerListener(mPocketDetectorListener);
+		mPocket.start();
 	}
 
 	@Override
 	protected void onDestroy() {		
 	    super.onDestroy();
+		mPocket.release();
 	    doUnbindService();
 	}	
 	
@@ -44,7 +51,10 @@ public class MainActivity extends Activity {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;       
     }
-    
+
+	/**
+	* Menu callback handler 
+	*/    
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		switch (item.getItemId())
@@ -57,9 +67,12 @@ public class MainActivity extends Activity {
         return true;
 	}
 
+	/**
+	* Handles volume buttons click 
+	*/
 	@Override
 	public boolean dispatchKeyEvent(KeyEvent event) {
-	    if (this.mService != null) {
+	    if (mService != null) {
 		    Preferences pref = Preferences.Open(getApplicationContext());
 		    int volume = pref.getVolume();
 		    int action = event.getAction();
@@ -79,10 +92,17 @@ public class MainActivity extends Activity {
 	    }
         return super.dispatchKeyEvent(event);
 	}
-	
+
+	/******************* Elements callback handlers *******************/
+
+	/**
+	* Power button click handler
+	*/
 	public void onPowerButtonClick(View view) {
 		Button btn = (Button)view;
-		btn.setActivated(!btn.isActivated());		
+		btn.setSelected(!btn.isSelected());
+		Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);		 
+		v.vibrate(75);
 	}
 	
 	/******************* Working with RobotService ********************/
@@ -92,8 +112,6 @@ public class MainActivity extends Activity {
 		public void onServiceConnected(ComponentName className, IBinder service) {
 	    	Log.i(LOG_TAG, "Service connected");
 	        mService = ((RobotService.RobotBinder)service).getService();
-	        mService.setListener(mListener);	        
-	        mService.start();
 	    }
 
 	    @Override
@@ -146,21 +164,26 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	/******************************************************************/
+	/******************* Working with Pocket detector *****************/
 	
-	ILegMovementListener mListener = new ILegMovementListener(){
+	private IInPocketListener mPocketDetectorListener = new IInPocketListener() {
 
-		@Override
-		public void onLegActivity(int activity) {
-			switch (activity) {
-			case LegMovementDetector.LEG_MOVEMENT_NONE:
-				break;
-			case LegMovementDetector.LEG_MOVEMENT_BACKWARD:
-				break;
-			case LegMovementDetector.LEG_MOVEMENT_FORWARD:
-				break;
+	/**
+		* Called when you put the phone in pocket
+		*/
+		public void phoneInPocket() {
+			if (mService != null) {
+				mService.start();
 			}
 		}
-		
+
+		/**
+		* Called when you take the phone out of pocket
+		*/
+		public void phoneOutOfPocket() {
+			if (mService != null) {
+				mService.stop();
+			}
+		}
 	};
 }

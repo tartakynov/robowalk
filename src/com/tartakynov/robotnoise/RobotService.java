@@ -104,6 +104,12 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
 		this.mLegMovementDetector.startDetector();
 		return true;
 	}	
+	
+	public void stop() {
+		if (mLegMovementDetector != null) {
+			this.mLegMovementDetector.stopDetector();			
+		}
+	}
 
 	/**
      * Show a notification while this service is running.
