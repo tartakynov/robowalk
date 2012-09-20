@@ -82,7 +82,7 @@ public class MainActivity extends Activity {
 	
 	public void onPowerButtonClick(View view) {
 		Button btn = (Button)view;
-		btn.setActivated(!btn.isActivated());
+		btn.setActivated(!btn.isActivated());		
 	}
 	
 	/******************* Working with RobotService ********************/
