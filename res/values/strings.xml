@@ -1,10 +1,10 @@
 <resources>
 
-    <string name="app_name">Звуки робота</string>
+    <string name="app_name">Robot Walk</string>
     <string name="menu_quit">Выход</string>
-    <string name="title_activity_main">Звуки робота</string>
-    <string name="robot_service_label">Звуки робота</string>
-    <string name="robot_service_text">Издает звуки робота когда вы ходите</string>
+    <string name="title_activity_main">Robot Walk</string>
+    <string name="robot_service_label">Robot Walk</string>
+    <string name="robot_service_text">Механический звук во время ходьбы</string>
     <string name="robot_power_on">Положите телефон в карман</string>
 
 </resources>

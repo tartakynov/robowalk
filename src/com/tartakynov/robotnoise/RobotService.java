@@ -157,7 +157,8 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
 	CharSequence text = getText(R.string.robot_service_text);
 	Notification notification = new Notification(R.drawable.ic_launcher, text, System.currentTimeMillis());
 	notification.flags = Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
-	PendingIntent contentIntent = PendingIntent.getActivity(this, 0, new Intent(this, MainActivity.class), 0);
+	Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+	PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
 	notification.setLatestEventInfo(this, getText(R.string.robot_service_label), text, contentIntent);
 	mNotificationManager.notify(id, notification);
     }
