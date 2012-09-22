@@ -1,6 +1,7 @@
 package com.tartakynov.robotnoise;
 
 import com.google.android.apps.analytics.GoogleAnalyticsTracker;
+import com.flurry.android.FlurryAgent;
 import com.tartakynov.robotnoise.Preferences.OnPreferenceChangeListener;
 import com.tartakynov.robotnoise.VolumeCircleView.ICircleAngleChanged;
 
@@ -58,6 +59,20 @@ public class MainActivity extends Activity {
 	super.onDestroy();
 	doUnbindService();
     }	
+
+    @Override
+    protected void onStart() {
+	super.onStart();
+	if (getResources().getBoolean(R.bool.flurry_enabled)) {
+	    FlurryAgent.onStartSession(this, getResources().getString(R.string.flurry));	    
+	}
+    }
+
+    @Override
+    protected void onStop() {
+	super.onStop();
+	FlurryAgent.onEndSession(this);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
