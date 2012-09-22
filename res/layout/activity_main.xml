@@ -3,6 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/background" >
+
+<com.tartakynov.robotnoise.VolumeCircleView
+    android:id="@+id/imageView1"
+    android:layout_width="230dp"
+    android:layout_height="230dp"
+    android:layout_centerHorizontal="true"
+    android:layout_centerVertical="true" />
+    
 <Button
     android:id="@+id/button_power"
     android:layout_width="wrap_content"
@@ -11,4 +19,5 @@
     android:layout_centerVertical="true"
     android:background="@drawable/power_button"
     android:onClick="onPowerButtonClick" />
+
 </RelativeLayout>

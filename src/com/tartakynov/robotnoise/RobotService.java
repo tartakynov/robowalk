@@ -3,7 +3,6 @@
  */
 package com.tartakynov.robotnoise;
 
-import com.tartakynov.robotnoise.Preferences.OnPreferenceChangeListener;
 import com.tartakynov.robotnoise.leg.LegMovementDetector;
 import com.tartakynov.robotnoise.leg.LegMovementDetector.ILegMovementListener;
 
@@ -23,7 +22,7 @@ import android.util.Log;
  * @author Артем
  *
  */
-public class RobotService extends Service implements OnPreferenceChangeListener {	
+public class RobotService extends Service {	
     private static final int NOTIFICATION 	= R.string.robot_service_label;
     private static final String WAKELOCK 	= "WL_TAG";    
     private static final String LOG_TAG		= "RobotService";
@@ -38,7 +37,7 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
     private LegMovementDetector mLegMovementDetector;    
     private LegMovementPlayer mPlayer;
     private boolean mIsStarted = false;
-    
+
     public class RobotBinder extends Binder {
 	RobotService getService() {
 	    return RobotService.this;
@@ -64,7 +63,7 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
     };
 
     /********************* Service *************************************/
-    
+
     @Override
     public IBinder onBind(Intent intent) {
 	return mBinder;
@@ -89,10 +88,6 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
 	this.mLegMovementDetector.addListener(mLegMovementListener);
 
 	showNotification(NOTIFICATION);
-
-	final Preferences pref = Preferences.Open(getApplicationContext());
-	pref.registerPreferenceChangeListener(this);
-	onPreferenceChanged(pref);
     }
 
     @Override
@@ -109,14 +104,6 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
 	return START_STICKY;
     }
 
-    /********************* OnPreferenceChangeListener ******************/
-
-    @Override
-    public void onPreferenceChanged(Preferences pref) {
-	Log.i(LOG_TAG, "onPreferenceChanged");
-	this.mPlayer.setVolume(pref.getVolume());
-    }
-
     /********************* Public methods*******************************/
 
     public void startDetector() {
@@ -130,17 +117,23 @@ public class RobotService extends Service implements OnPreferenceChangeListener 
 	    this.mLegMovementDetector.stopDetector();			
 	}
     }
-    
+
     public boolean isStarted() {
 	return mIsStarted;
     }
-    
+
     public void start() {
 	mIsStarted = true;	
     }
 
     public void stop() {
 	mIsStarted = false;	
+    }
+
+    public void setVolume(float volume) {
+	if (mPlayer != null) {
+	    mPlayer.setVolume(volume);
+	}	
     }
 
     public static boolean isRunning() {
