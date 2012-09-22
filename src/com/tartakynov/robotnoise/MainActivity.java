@@ -43,7 +43,7 @@ public class MainActivity extends Activity {
 	mPocket.registerListener(mPocketDetectorListener);
 	mPocket.start();	
     }
-
+    
     @Override
     protected void onDestroy() {		
 	super.onDestroy();
