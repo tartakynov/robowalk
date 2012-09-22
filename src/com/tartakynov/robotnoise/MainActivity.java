@@ -36,14 +36,14 @@ public class MainActivity extends Activity {
 	super.onCreate(savedInstanceState);		
 	setContentView(R.layout.activity_main);
 
+	mPowerButton = (Button)findViewById(R.id.button_power);
+	mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);	
+
 	mPreferences = Preferences.Open(getApplicationContext());
 	mPreferences.registerPreferenceChangeListener(mPreferenceChangeListener);
-	mPowerButton = (Button)findViewById(R.id.button_power);
 	mCircleView = (VolumeCircleView)findViewById(R.id.imageView1);
 	mCircleView.registerListener(mAngleChangeListener);
 	mCircleView.setAngle(mPreferences.getAngle());
-
-	mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);	
 
 	doStartService();
 	doBindService();
