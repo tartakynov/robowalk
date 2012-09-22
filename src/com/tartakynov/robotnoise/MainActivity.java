@@ -1,6 +1,8 @@
 package com.tartakynov.robotnoise;
 
 import com.tartakynov.robotnoise.PocketDetector.IInPocketListener;
+import com.tartakynov.robotnoise.Preferences.OnPreferenceChangeListener;
+import com.tartakynov.robotnoise.VolumeCircleView.ICircleAngleChanged;
 
 import android.os.Bundle;
 import android.os.IBinder;
@@ -17,6 +19,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
+import android.graphics.BitmapFactory;
+import android.graphics.BitmapShader;
+import android.graphics.Shader.TileMode;
 import android.hardware.SensorManager;
 
 public class MainActivity extends Activity {
@@ -28,6 +33,8 @@ public class MainActivity extends Activity {
     private Vibrator mVibrator;
     private boolean mIsServiceBound = false;
     private Button mPowerButton;
+    private VolumeCircleView mCircleView;
+    private Preferences mPreferences;
     
     /********************* Activity ************************************/
 
@@ -35,13 +42,23 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);		
 	setContentView(R.layout.activity_main);
-	doStartService();
-	doBindService();
+	
+	mPreferences = Preferences.Open(getApplicationContext());
+	mPreferences.registerPreferenceChangeListener(mPreferenceChangeListener);
 	mPowerButton = (Button)findViewById(R.id.button_power);
-	mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);		 	
+	mCircleView = (VolumeCircleView)findViewById(R.id.imageView1);
+	mCircleView.registerListener(mAngleChangeListener);
+	mCircleView.setAngle(mPreferences.getAngle());
+	
+	
+	mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);	
+
 	mPocket = new PocketDetector((SensorManager) getSystemService(SENSOR_SERVICE));
 	mPocket.registerListener(mPocketDetectorListener);
 	mPocket.start();	
+
+	doStartService();
+	doBindService();
     }
     
     @Override
@@ -72,31 +89,31 @@ public class MainActivity extends Activity {
 	return true;
     }
 
-    /**
-     * Handles volume buttons click 
-     */
-    @Override
-    public boolean dispatchKeyEvent(KeyEvent event) {
-	if (mService != null) {
-	    Preferences pref = Preferences.Open(getApplicationContext());
-	    int volume = pref.getVolume();
-	    int action = event.getAction();
-	    int keyCode = event.getKeyCode();
-	    switch (keyCode) {
-	    case KeyEvent.KEYCODE_VOLUME_UP:
-		if ((action == KeyEvent.ACTION_UP) && (volume < 20)) {
-		    pref.setVolume(volume + 1);	            	
-		}
-		return true;
-	    case KeyEvent.KEYCODE_VOLUME_DOWN:
-		if ((action == KeyEvent.ACTION_DOWN) && (volume > 0)) {
-		    pref.setVolume(volume - 1);
-		}
-		return true;
-	    }	    	
-	}
-	return super.dispatchKeyEvent(event);
-    }
+//    /**
+//     * Handles volume buttons click 
+//     */
+//    @Override
+//    public boolean dispatchKeyEvent(KeyEvent event) {
+//	if (mService != null) {
+//	    Preferences pref = Preferences.Open(getApplicationContext());
+//	    int volume = pref.getVolume();
+//	    int action = event.getAction();
+//	    int keyCode = event.getKeyCode();
+//	    switch (keyCode) {
+//	    case KeyEvent.KEYCODE_VOLUME_UP:
+//		if ((action == KeyEvent.ACTION_UP) && (volume < 20)) {
+//		    pref.setVolume(volume + 1);	            	
+//		}
+//		return true;
+//	    case KeyEvent.KEYCODE_VOLUME_DOWN:
+//		if ((action == KeyEvent.ACTION_DOWN) && (volume > 0)) {
+//		    pref.setVolume(volume - 1);
+//		}
+//		return true;
+//	    }	    	
+//	}
+//	return super.dispatchKeyEvent(event);
+//    }
 
     /******************* Elements callback handlers *******************/
 
@@ -119,6 +136,33 @@ public class MainActivity extends Activity {
 	}
     }
 
+    /******************* Working with VolumeCircleView ****************/
+    
+    private ICircleAngleChanged mAngleChangeListener = new ICircleAngleChanged() {
+
+	@Override
+	public void onAngleChanged(int angle) {	    
+	    if (mPreferences != null) {
+		mPreferences.setAngle(angle);
+	    }
+	}
+	
+    };
+
+    /******************* Working with Preferences *********************/
+
+    private OnPreferenceChangeListener mPreferenceChangeListener = new OnPreferenceChangeListener() {
+
+	@Override
+	public void onPreferenceChanged(Preferences pref) {
+	    if (mService != null) {
+		int volume = map(360, 20, pref.getAngle());
+		mService.setVolume(volume);
+	    }
+	}
+
+    };
+    
     /******************* Working with RobotService ********************/
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -126,6 +170,8 @@ public class MainActivity extends Activity {
 	public void onServiceConnected(ComponentName className, IBinder service) {
 	    Log.i(LOG_TAG, "Service connected");
 	    mService = ((RobotService.RobotBinder)service).getService();
+	    int volume = map(360, 20, mPreferences.getAngle());
+	    mService.setVolume(volume);
 	    mPowerButton.setSelected(mService.isStarted());
 	}
 
@@ -201,4 +247,13 @@ public class MainActivity extends Activity {
 	    }
 	}
     };
+    
+    /********************* Private methods *****************************/
+
+    /**
+     * Maps integer value from one range to another
+    */
+    private int map(int maxFrom, int maxTo, int value) {
+	return (int)((value) * ((float)maxTo / (float)maxFrom));
+    }    
 }

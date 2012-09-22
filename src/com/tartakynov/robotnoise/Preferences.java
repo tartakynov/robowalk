@@ -58,15 +58,15 @@ public class Preferences implements OnSharedPreferenceChangeListener {
 	mEdit = mPref.edit();
 	mPref.registerOnSharedPreferenceChangeListener(this);
     }	
-
-    public int getVolume() {
-	return mPref.getInt("volume", DEFAULT_VOLUME);
+    
+    public int getAngle() {
+	return mPref.getInt("angle", 180);
     }
 
-    public void setVolume(int volume) {
-	if (volume >= 0) {
-	    mEdit.putInt("volume", volume);		
+    public void setAngle(int angle) {
+	if (angle >= 0) {
+	    mEdit.putInt("angle", angle);		
 	    mEdit.commit();				
 	}
-    }
+    }        
 }
