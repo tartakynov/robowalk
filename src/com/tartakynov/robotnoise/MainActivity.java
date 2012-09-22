@@ -13,15 +13,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import android.graphics.BitmapFactory;
-import android.graphics.BitmapShader;
-import android.graphics.Shader.TileMode;
 import android.hardware.SensorManager;
 
 public class MainActivity extends Activity {
@@ -35,22 +31,21 @@ public class MainActivity extends Activity {
     private Button mPowerButton;
     private VolumeCircleView mCircleView;
     private Preferences mPreferences;
-    
+
     /********************* Activity ************************************/
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
 	super.onCreate(savedInstanceState);		
 	setContentView(R.layout.activity_main);
-	
+
 	mPreferences = Preferences.Open(getApplicationContext());
 	mPreferences.registerPreferenceChangeListener(mPreferenceChangeListener);
 	mPowerButton = (Button)findViewById(R.id.button_power);
 	mCircleView = (VolumeCircleView)findViewById(R.id.imageView1);
 	mCircleView.registerListener(mAngleChangeListener);
 	mCircleView.setAngle(mPreferences.getAngle());
-	
-	
+
 	mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);	
 
 	mPocket = new PocketDetector((SensorManager) getSystemService(SENSOR_SERVICE));
@@ -60,7 +55,7 @@ public class MainActivity extends Activity {
 	doStartService();
 	doBindService();
     }
-    
+
     @Override
     protected void onDestroy() {		
 	super.onDestroy();
@@ -89,32 +84,6 @@ public class MainActivity extends Activity {
 	return true;
     }
 
-//    /**
-//     * Handles volume buttons click 
-//     */
-//    @Override
-//    public boolean dispatchKeyEvent(KeyEvent event) {
-//	if (mService != null) {
-//	    Preferences pref = Preferences.Open(getApplicationContext());
-//	    int volume = pref.getVolume();
-//	    int action = event.getAction();
-//	    int keyCode = event.getKeyCode();
-//	    switch (keyCode) {
-//	    case KeyEvent.KEYCODE_VOLUME_UP:
-//		if ((action == KeyEvent.ACTION_UP) && (volume < 20)) {
-//		    pref.setVolume(volume + 1);	            	
-//		}
-//		return true;
-//	    case KeyEvent.KEYCODE_VOLUME_DOWN:
-//		if ((action == KeyEvent.ACTION_DOWN) && (volume > 0)) {
-//		    pref.setVolume(volume - 1);
-//		}
-//		return true;
-//	    }	    	
-//	}
-//	return super.dispatchKeyEvent(event);
-//    }
-
     /******************* Elements callback handlers *******************/
 
     /**
@@ -137,7 +106,7 @@ public class MainActivity extends Activity {
     }
 
     /******************* Working with VolumeCircleView ****************/
-    
+
     private ICircleAngleChanged mAngleChangeListener = new ICircleAngleChanged() {
 
 	@Override
@@ -146,7 +115,7 @@ public class MainActivity extends Activity {
 		mPreferences.setAngle(angle);
 	    }
 	}
-	
+
     };
 
     /******************* Working with Preferences *********************/
@@ -155,14 +124,11 @@ public class MainActivity extends Activity {
 
 	@Override
 	public void onPreferenceChanged(Preferences pref) {
-	    if (mService != null) {
-		int volume = map(360, 20, pref.getAngle());
-		mService.setVolume(volume);
-	    }
+	    setVolumeAngle(mService, pref.getAngle());
 	}
 
     };
-    
+
     /******************* Working with RobotService ********************/
 
     private ServiceConnection mConnection = new ServiceConnection() {
@@ -170,8 +136,7 @@ public class MainActivity extends Activity {
 	public void onServiceConnected(ComponentName className, IBinder service) {
 	    Log.i(LOG_TAG, "Service connected");
 	    mService = ((RobotService.RobotBinder)service).getService();
-	    int volume = map(360, 20, mPreferences.getAngle());
-	    mService.setVolume(volume);
+	    setVolumeAngle(mService, mPreferences.getAngle());
 	    mPowerButton.setSelected(mService.isStarted());
 	}
 
@@ -247,13 +212,20 @@ public class MainActivity extends Activity {
 	    }
 	}
     };
-    
+
     /********************* Private methods *****************************/
+
+    private static final void setVolumeAngle(RobotService service, int angle) {
+	if (service != null) {
+	    float volume = map(360, 1, angle);
+	    service.setVolume(volume);	    
+	}
+    }
 
     /**
      * Maps integer value from one range to another
-    */
-    private int map(int maxFrom, int maxTo, int value) {
-	return (int)((value) * ((float)maxTo / (float)maxFrom));
+     */
+    private static final float map(float maxFrom, float maxTo, float value) {
+	return value * (maxTo / maxFrom);
     }    
 }

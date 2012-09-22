@@ -20,7 +20,7 @@ public class Preferences implements OnSharedPreferenceChangeListener {
 
     }
 
-    private static final int DEFAULT_VOLUME = 15;	
+    private static final int DEFAULT_ANGLE = 180;	
 
     private static volatile Preferences sInstance = null;	
 
@@ -58,9 +58,9 @@ public class Preferences implements OnSharedPreferenceChangeListener {
 	mEdit = mPref.edit();
 	mPref.registerOnSharedPreferenceChangeListener(this);
     }	
-    
+
     public int getAngle() {
-	return mPref.getInt("angle", 180);
+	return mPref.getInt("angle", DEFAULT_ANGLE);
     }
 
     public void setAngle(int angle) {

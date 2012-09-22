@@ -29,12 +29,12 @@ public class VolumeCircleView extends ImageView {
 	 */
 	void onAngleChanged(int angle);
     }
-    
+
     private final RectF mOval = new RectF();	
     private final Paint mPaint = new Paint();
     private final ArrayList<ICircleAngleChanged> mListeners = new ArrayList<ICircleAngleChanged>();
     private int mAngle = 0;
-    
+
     public VolumeCircleView(Context context, AttributeSet attrs, int defStyle) {
 	super(context, attrs, defStyle);
 	init();
@@ -56,7 +56,7 @@ public class VolumeCircleView extends ImageView {
 	mAngle = angle;
 	invalidate();
     }
-    
+
     public int getAngle() { 
 	return mAngle; 
     }
@@ -64,7 +64,7 @@ public class VolumeCircleView extends ImageView {
     public void registerListener(ICircleAngleChanged listener) {
 	mListeners.add(listener);
     }
-        
+
     /********************* ImageView methods ***************************/
 
     @Override
@@ -104,7 +104,7 @@ public class VolumeCircleView extends ImageView {
 	mPaint.setAntiAlias(true);
 	mPaint.setDither(true);
     }
-    
+
     private void notifyListeners() {
 	for (ICircleAngleChanged listener : mListeners) {
 	    listener.onAngleChanged(mAngle);

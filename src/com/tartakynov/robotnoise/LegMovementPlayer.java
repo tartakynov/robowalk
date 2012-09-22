@@ -18,10 +18,13 @@ public class LegMovementPlayer implements OnAudioFocusChangeListener {
     private MediaPlayer[] mPlayers = new MediaPlayer[2];
     private Object mSync = new Object();
     private boolean mCanPlay = false;
+    private float mVolume;
 
     public LegMovementPlayer(Context context) {
 	this.mContext = context;
 	this.mAudioManager = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
+	final int  maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+	mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
 	int result = mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 	if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
 	    init();
@@ -47,8 +50,13 @@ public class LegMovementPlayer implements OnAudioFocusChangeListener {
     /**
      * Sets volume
      */
-    public void setVolume(int volume) {
-	mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, volume, 0);
+    public void setVolume(float volume) {	
+	mVolume = volume;	
+	for (MediaPlayer player : mPlayers) {
+	    if (player != null) {
+		player.setVolume(volume, volume);
+	    }
+	}
     }
 
     /**
@@ -74,14 +82,14 @@ public class LegMovementPlayer implements OnAudioFocusChangeListener {
 	synchronized (mSync) {
 	    mPlayers[PLAYER_FORWARD] = MediaPlayer.create(mContext, R.raw.forward);
 	    mPlayers[PLAYER_BACKWARD] = MediaPlayer.create(mContext, R.raw.backward);
-	    mPlayers[PLAYER_FORWARD].setVolume(1.0f, 1.0f);
-	    mPlayers[PLAYER_BACKWARD].setVolume(1.0f, 1.0f);
+	    mPlayers[PLAYER_FORWARD].setVolume(mVolume, mVolume);
+	    mPlayers[PLAYER_BACKWARD].setVolume(mVolume, mVolume);
 	    mCanPlay = true;							
 	}
     }
 
     /********************* OnAudioFocusChangeListener ******************/
-    
+
     /**
      * Handles audio focus change for this listener
      */

@@ -37,7 +37,7 @@ public class RobotService extends Service {
     private LegMovementDetector mLegMovementDetector;    
     private LegMovementPlayer mPlayer;
     private boolean mIsStarted = false;
-    
+
     public class RobotBinder extends Binder {
 	RobotService getService() {
 	    return RobotService.this;
@@ -63,7 +63,7 @@ public class RobotService extends Service {
     };
 
     /********************* Service *************************************/
-    
+
     @Override
     public IBinder onBind(Intent intent) {
 	return mBinder;
@@ -117,11 +117,11 @@ public class RobotService extends Service {
 	    this.mLegMovementDetector.stopDetector();			
 	}
     }
-    
+
     public boolean isStarted() {
 	return mIsStarted;
     }
-    
+
     public void start() {
 	mIsStarted = true;	
     }
@@ -129,8 +129,8 @@ public class RobotService extends Service {
     public void stop() {
 	mIsStarted = false;	
     }
-    
-    public void setVolume(int volume) {
+
+    public void setVolume(float volume) {
 	if (mPlayer != null) {
 	    mPlayer.setVolume(volume);
 	}	
