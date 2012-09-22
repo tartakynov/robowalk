@@ -1,5 +1,6 @@
 package com.tartakynov.robotnoise;
 
+import com.google.android.apps.analytics.GoogleAnalyticsTracker;
 import com.tartakynov.robotnoise.Preferences.OnPreferenceChangeListener;
 import com.tartakynov.robotnoise.VolumeCircleView.ICircleAngleChanged;
 
@@ -28,7 +29,8 @@ public class MainActivity extends Activity {
     private Button mPowerButton;
     private VolumeCircleView mCircleView;
     private Preferences mPreferences;
-
+    private GoogleAnalyticsTracker mGATracker;
+    
     /********************* Activity ************************************/
 
     @Override
@@ -39,6 +41,8 @@ public class MainActivity extends Activity {
 	mPowerButton = (Button)findViewById(R.id.button_power);
 	mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);	
 
+	mGATracker = GoogleAnalyticsTracker.getInstance(); 
+	
 	mPreferences = Preferences.Open(getApplicationContext());
 	mPreferences.registerPreferenceChangeListener(mPreferenceChangeListener);
 	mCircleView = (VolumeCircleView)findViewById(R.id.imageView1);
