@@ -1,5 +1,6 @@
 package com.tartakynov.robotnoise;
 
+import com.tartakynov.robotnoise.PocketDetector.IInPocketListener;
 import com.tartakynov.robotnoise.leg.LegMovementDetector;
 import com.tartakynov.robotnoise.leg.LegMovementDetector.ILegMovementListener;
 
@@ -31,6 +32,7 @@ public class RobotService extends Service {
     private PowerManager.WakeLock mWakeLock;
     private LegMovementDetector mLegMovementDetector;    
     private LegMovementPlayer mPlayer;
+    private PocketDetector mPocket;
     private boolean mIsStarted = false;
 
     public class RobotBinder extends Binder {
@@ -69,18 +71,23 @@ public class RobotService extends Service {
 	sIsRunning = true;
 
 	// initialize class fields
-	this.mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);		
-	this.mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-	this.mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-	this.mPlayer = new LegMovementPlayer(getApplicationContext());
+	mNotificationManager = (NotificationManager)getSystemService(NOTIFICATION_SERVICE);		
+	mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+	mPowerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+	mPlayer = new LegMovementPlayer(getApplicationContext());
 
 	// initialize wakelock
-	this.mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK);
-	this.mWakeLock.acquire();    	
+	mWakeLock = mPowerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, WAKELOCK);
+	mWakeLock.acquire();    	
 
 	// initialize movement detector
-	this.mLegMovementDetector = new LegMovementDetector(mSensorManager);
-	this.mLegMovementDetector.addListener(mLegMovementListener);
+	mLegMovementDetector = new LegMovementDetector(mSensorManager);
+	mLegMovementDetector.addListener(mLegMovementListener);
+
+	// initialize pocket detector
+	mPocket = new PocketDetector((SensorManager) getSystemService(SENSOR_SERVICE));
+	mPocket.registerListener(mPocketDetectorListener);
+	mPocket.start();	
 
 	showNotification(NOTIFICATION);
     }
@@ -88,10 +95,11 @@ public class RobotService extends Service {
     @Override
     public void onDestroy() {
 	sIsRunning = false;
-	this.mLegMovementDetector.stopDetector();
-	this.mNotificationManager.cancel(NOTIFICATION);    		
-	this.mPlayer.release(); 
-	this.mWakeLock.release();
+	mLegMovementDetector.stopDetector();
+	mNotificationManager.cancel(NOTIFICATION);    		
+	mPocket.release();
+	mPlayer.release(); 
+	mWakeLock.release();
     }        
 
     @Override
@@ -101,28 +109,19 @@ public class RobotService extends Service {
 
     /********************* Public methods*******************************/
 
-    public void startDetector() {
-	if (this.mLegMovementDetector != null) { // just to be on safe side
-	    this.mLegMovementDetector.startDetector();
-	}
+    public void start() {
+	mPocket.start();
+	mIsStarted = true;	
     }	
 
-    public void stopDetector() {
-	if (mLegMovementDetector != null) {
-	    this.mLegMovementDetector.stopDetector();			
-	}
+    public void stop() {
+	mPocket.stop();			
+	mLegMovementDetector.stopDetector();
+	mIsStarted = false;	
     }
 
     public boolean isStarted() {
 	return mIsStarted;
-    }
-
-    public void start() {
-	mIsStarted = true;	
-    }
-
-    public void stop() {
-	mIsStarted = false;	
     }
 
     public void setVolume(float volume) {
@@ -134,6 +133,29 @@ public class RobotService extends Service {
     public static boolean isRunning() {
 	return sIsRunning;
     }
+
+    /******************* Working with Pocket detector *****************/
+
+    private IInPocketListener mPocketDetectorListener = new IInPocketListener() {
+
+	/**
+	 * Called when you put the phone in pocket
+	 */
+	public void phoneInPocket() {
+	    if (mLegMovementDetector != null) { // just to be on safe side
+		mLegMovementDetector.startDetector();
+	    }
+	}
+
+	/**
+	 * Called when you take the phone out of pocket
+	 */
+	public void phoneOutOfPocket() {
+	    if (mLegMovementDetector != null) {
+		mLegMovementDetector.stopDetector();			
+	    }
+	}
+    };
 
     /********************* Private methods *****************************/
 

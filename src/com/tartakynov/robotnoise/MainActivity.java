@@ -1,6 +1,5 @@
 package com.tartakynov.robotnoise;
 
-import com.tartakynov.robotnoise.PocketDetector.IInPocketListener;
 import com.tartakynov.robotnoise.Preferences.OnPreferenceChangeListener;
 import com.tartakynov.robotnoise.VolumeCircleView.ICircleAngleChanged;
 
@@ -18,14 +17,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
-import android.hardware.SensorManager;
 
 public class MainActivity extends Activity {
 
     public static final String LOG_TAG = "MainActivity";
 
     private RobotService mService;
-    private PocketDetector mPocket;
     private Vibrator mVibrator;
     private boolean mIsServiceBound = false;
     private Button mPowerButton;
@@ -48,10 +45,6 @@ public class MainActivity extends Activity {
 
 	mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);	
 
-	mPocket = new PocketDetector((SensorManager) getSystemService(SENSOR_SERVICE));
-	mPocket.registerListener(mPocketDetectorListener);
-	mPocket.start();	
-
 	doStartService();
 	doBindService();
     }
@@ -59,7 +52,6 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {		
 	super.onDestroy();
-	mPocket.release();
 	doUnbindService();
     }	
 
@@ -189,29 +181,6 @@ public class MainActivity extends Activity {
 	    stopService(new Intent(this, RobotService.class));
 	}
     }
-
-    /******************* Working with Pocket detector *****************/
-
-    private IInPocketListener mPocketDetectorListener = new IInPocketListener() {
-
-	/**
-	 * Called when you put the phone in pocket
-	 */
-	public void phoneInPocket() {
-	    if (mService != null) {
-		mService.startDetector();
-	    }
-	}
-
-	/**
-	 * Called when you take the phone out of pocket
-	 */
-	public void phoneOutOfPocket() {
-	    if (mService != null) {
-		mService.stopDetector();
-	    }
-	}
-    };
 
     /********************* Private methods *****************************/
 
