@@ -31,7 +31,7 @@ public class MainActivity extends Activity {
     private VolumeCircleView mCircleView;
     private Preferences mPreferences;
     private GoogleAnalyticsTracker mGATracker;
-    
+
     /********************* Activity ************************************/
 
     @Override
@@ -41,7 +41,7 @@ public class MainActivity extends Activity {
 
 	mPowerButton = (Button)findViewById(R.id.button_power);
 	mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);	
-	
+
 	mPreferences = Preferences.Open(getApplicationContext());
 	mPreferences.registerPreferenceChangeListener(mPreferenceChangeListener);
 	mCircleView = (VolumeCircleView)findViewById(R.id.imageView1);
@@ -195,21 +195,22 @@ public class MainActivity extends Activity {
 	if (gaEnabled) {	    
 	    mGATracker = GoogleAnalyticsTracker.getInstance(); 
 	    mGATracker.startNewSession(getResources().getString(R.string.ganalytics), this);
+	    mGATracker.trackPageView("/MainActivity");
 	}
 	if (flurryEnabled) {
 	    FlurryAgent.onStartSession(this, getResources().getString(R.string.flurry));	    
 	}	
     }
-    
+
     private void stopAnalyticsSession() {
 	if (mGATracker != null) {
 	    mGATracker.stopSession();
 	}
 	FlurryAgent.onEndSession(this);
     }
-    
+
     /********************* Private methods *****************************/
-    
+
     private static final void setVolumeAngle(RobotService service, int angle) {
 	if (service != null) {
 	    float volume = map(360, 1, angle);
