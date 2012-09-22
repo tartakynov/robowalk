@@ -41,8 +41,6 @@ public class MainActivity extends Activity {
 
 	mPowerButton = (Button)findViewById(R.id.button_power);
 	mVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);	
-
-	mGATracker = GoogleAnalyticsTracker.getInstance(); 
 	
 	mPreferences = Preferences.Open(getApplicationContext());
 	mPreferences.registerPreferenceChangeListener(mPreferenceChangeListener);
@@ -50,6 +48,7 @@ public class MainActivity extends Activity {
 	mCircleView.registerListener(mAngleChangeListener);
 	mCircleView.setAngle(mPreferences.getAngle());
 
+	startAnalyticsSession();
 	doStartService();
 	doBindService();
     }
@@ -58,21 +57,8 @@ public class MainActivity extends Activity {
     protected void onDestroy() {		
 	super.onDestroy();
 	doUnbindService();
+	stopAnalyticsSession();
     }	
-
-    @Override
-    protected void onStart() {
-	super.onStart();
-	if (getResources().getBoolean(R.bool.flurry_enabled)) {
-	    FlurryAgent.onStartSession(this, getResources().getString(R.string.flurry));	    
-	}
-    }
-
-    @Override
-    protected void onStop() {
-	super.onStop();
-	FlurryAgent.onEndSession(this);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -161,7 +147,7 @@ public class MainActivity extends Activity {
     /***
      * Binds service if it's not bound already
      */
-    void doBindService() {
+    private void doBindService() {
 	if (!mIsServiceBound) {
 	    Log.i(LOG_TAG, "doBindService");
 	    bindService(new Intent(MainActivity.this, RobotService.class), mConnection, Context.BIND_AUTO_CREATE + Context.BIND_DEBUG_UNBIND);
@@ -172,7 +158,7 @@ public class MainActivity extends Activity {
     /***
      * Unbinds service if it's bound
      */
-    void doUnbindService() {
+    private void doUnbindService() {
 	if (mIsServiceBound) {
 	    Log.i(LOG_TAG, "doUnbindService");
 	    unbindService(mConnection);
@@ -183,7 +169,7 @@ public class MainActivity extends Activity {
     /***
      * Starts service if it's not running already
      */
-    void doStartService() {
+    private void doStartService() {
 	if (!RobotService.isRunning()) {
 	    Log.i(LOG_TAG, "startService");
 	    startService(new Intent(MainActivity.this, RobotService.class));		
@@ -193,7 +179,7 @@ public class MainActivity extends Activity {
     /***
      * Stops service if it's running
      */
-    void doStopService() {
+    private void doStopService() {
 	if (RobotService.isRunning())
 	{
 	    Log.i(LOG_TAG, "stopService");
@@ -201,8 +187,29 @@ public class MainActivity extends Activity {
 	}
     }
 
-    /********************* Private methods *****************************/
+    /********************* Working with Analytics **********************/
 
+    private void startAnalyticsSession() {
+	boolean gaEnabled = getResources().getBoolean(R.bool.ga_enabled);
+	boolean flurryEnabled = getResources().getBoolean(R.bool.flurry_enabled);
+	if (gaEnabled) {	    
+	    mGATracker = GoogleAnalyticsTracker.getInstance(); 
+	    mGATracker.startNewSession(getResources().getString(R.string.ganalytics), this);
+	}
+	if (flurryEnabled) {
+	    FlurryAgent.onStartSession(this, getResources().getString(R.string.flurry));	    
+	}	
+    }
+    
+    private void stopAnalyticsSession() {
+	if (mGATracker != null) {
+	    mGATracker.stopSession();
+	}
+	FlurryAgent.onEndSession(this);
+    }
+    
+    /********************* Private methods *****************************/
+    
     private static final void setVolumeAngle(RobotService service, int angle) {
 	if (service != null) {
 	    float volume = map(360, 1, angle);
