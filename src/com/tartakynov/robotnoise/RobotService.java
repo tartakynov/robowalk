@@ -1,6 +1,3 @@
-/**
- * 
- */
 package com.tartakynov.robotnoise;
 
 import com.tartakynov.robotnoise.leg.LegMovementDetector;
@@ -16,7 +13,6 @@ import android.hardware.SensorManager;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.util.Log;
 
 /**
  * @author Артем
@@ -25,7 +21,6 @@ import android.util.Log;
 public class RobotService extends Service {	
     private static final int NOTIFICATION 	= R.string.robot_service_label;
     private static final String WAKELOCK 	= "WL_TAG";    
-    private static final String LOG_TAG		= "RobotService";
 
     private static boolean sIsRunning = false;
 
@@ -151,7 +146,8 @@ public class RobotService extends Service {
 	Notification notification = new Notification(R.drawable.ic_launcher, text, System.currentTimeMillis());
 	notification.flags = Notification.FLAG_NO_CLEAR | Notification.FLAG_ONGOING_EVENT;
 	Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-	PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_CANCEL_CURRENT);
+	intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+	PendingIntent contentIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, 0);
 	notification.setLatestEventInfo(this, getText(R.string.robot_service_label), text, contentIntent);
 	mNotificationManager.notify(id, notification);
     }
