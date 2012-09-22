@@ -6,11 +6,10 @@
 
 <com.tartakynov.robotnoise.VolumeCircleView
     android:id="@+id/imageView1"
-    android:layout_width="208dp"
-    android:layout_height="wrap_content"
+    android:layout_width="230dp"
+    android:layout_height="230dp"
     android:layout_centerHorizontal="true"
-    android:layout_centerVertical="true"
-    android:src="@drawable/volume_background" />
+    android:layout_centerVertical="true" />
     
 <Button
     android:id="@+id/button_power"
