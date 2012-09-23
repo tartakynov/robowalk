@@ -94,13 +94,13 @@ public class MainActivity extends Activity {
 	    } else {
 		mService.start();		
 		Toast.makeText(this, R.string.robot_power_on, Toast.LENGTH_SHORT).show();
+		if (mGATracker != null) {
+		    mGATracker.dispatch();
+		}
 	    }
 	    btn.setSelected(mService.isStarted());
 	    if (mVibrator != null) {
 		mVibrator.vibrate(75);
-	    }
-	    if (mGATracker != null) {
-		mGATracker.dispatch();
 	    }
 	}
     }
