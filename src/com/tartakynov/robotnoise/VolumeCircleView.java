@@ -81,10 +81,17 @@ public class VolumeCircleView extends ImageView {
 	float centerY = getHeight() / 2.0f;
 	float touchedX = event.getX();
 	float touchedY = event.getY();
-	mAngle = (int) (Math.toDegrees(Math.atan2(centerY - touchedY, centerX - touchedX))) + 90;	
-	if (mAngle < 0) {
-	    mAngle = 360 + mAngle;
+	int angle = (int) (Math.toDegrees(Math.atan2(centerY - touchedY, centerX - touchedX))) + 90;	
+	if (angle < 0) {
+	    angle += 360;
 	}
+	if ((angle < 30) && (mAngle > 350)) {
+	    return true;
+	}	
+	if ((angle > 330) && (mAngle < 10)) {
+	    return true;
+	}
+	mAngle = angle;
 	if (event.getAction() == MotionEvent.ACTION_UP) {
 	    notifyListeners();
 	}
