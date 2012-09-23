@@ -1,10 +1,10 @@
 <resources>
 
-    <string name="app_name">Robot Walk</string>
-    <string name="menu_quit">Выход</string>
-    <string name="title_activity_main">Robot Walk</string>
-    <string name="robot_service_label">Robot Walk</string>
-    <string name="robot_service_text">Механический звук во время ходьбы</string>
-    <string name="robot_power_on">Положите телефон в карман</string>
+    <string name="app_name">Mechanicus</string>
+    <string name="title_activity_main">Mechanicus</string>
+    <string name="robot_service_label">Mechanicus</string>
+    <string name="menu_quit">Exit</string>
+    <string name="robot_service_text">Mechanic step sounds</string>
+    <string name="robot_power_on">Please put the phone in your pocket</string>
 
 </resources>
