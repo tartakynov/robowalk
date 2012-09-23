@@ -6,5 +6,7 @@
     <string name="menu_quit">Выход</string>
     <string name="robot_service_text">Механические звуки во время ходьбы</string>
     <string name="robot_power_on">Теперь положите телефон в карман</string>
-
+    <string name="flurry">8J3WG7NC5BG9VH2RV5ZS</string>
+    <string name="ganalytics">UA-35026242-1</string>
+    
 </resources>
