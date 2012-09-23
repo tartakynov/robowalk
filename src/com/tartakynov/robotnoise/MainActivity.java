@@ -99,6 +99,9 @@ public class MainActivity extends Activity {
 	    if (mVibrator != null) {
 		mVibrator.vibrate(75);
 	    }
+	    if (mGATracker != null) {
+		mGATracker.dispatch();
+	    }
 	}
     }
 
@@ -204,6 +207,7 @@ public class MainActivity extends Activity {
 
     private void stopAnalyticsSession() {
 	if (mGATracker != null) {
+	    mGATracker.dispatch();
 	    mGATracker.stopSession();
 	}
 	FlurryAgent.onEndSession(this);
