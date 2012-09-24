@@ -1,9 +1,12 @@
 <resources>
 
     <string name="app_name">Mechanicus</string>
+    <string name="app_version">1.0</string>
     <string name="title_activity_main">Mechanicus</string>
     <string name="robot_service_label">Mechanicus</string>
+    <string name="menu_about">О приложении</string>
     <string name="menu_quit">Выход</string>
+    <string name="about_label">Автор: Артем Тартакынов\nИконки: Mattahan (Paul Davey)</string>
     <string name="robot_service_text">Механические звуки во время ходьбы</string>
     <string name="robot_power_on">Теперь положите телефон в карман</string>
     <string name="flurry">8J3WG7NC5BG9VH2RV5ZS</string>

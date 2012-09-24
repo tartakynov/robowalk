@@ -1,12 +1,15 @@
 <resources>
 
     <string name="app_name">Mechanicus</string>
+    <string name="app_version">1.0</string>
     <string name="title_activity_main">Mechanicus</string>
     <string name="robot_service_label">Mechanicus</string>
+    <string name="menu_about">About</string>
     <string name="menu_quit">Exit</string>
+    <string name="about_label">Authored by Artem Tartakynov\nIcons by Mattahan (Paul Davey)</string>
     <string name="robot_service_text">Mechanic step sounds</string>
-    <string name="robot_power_on">Please put the phone in your pocket</string>
+    <string name="robot_power_on">Now put the phone in your pocket</string>
     <string name="flurry">8J3WG7NC5BG9VH2RV5ZS</string>
     <string name="ganalytics">UA-35026242-1</string>
-    
+
 </resources>

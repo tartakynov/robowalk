@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<bool name="flurry_enabled">true</bool>
-	<bool name="ga_enabled">true</bool>
+	<bool name="flurry_enabled">false</bool>
+	<bool name="ga_enabled">false</bool>
 </resources>

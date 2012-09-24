@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Vibrator;
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +18,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -76,6 +79,9 @@ public class MainActivity extends Activity {
 	case R.id.menu_quit: // MENU QUIT
 	    doStopService();
 	    finish();        
+	    break;
+	case R.id.menu_about: // MENU ABOUT
+	    showAboutDialog();
 	    break;
 	}
 	return true;
@@ -214,6 +220,24 @@ public class MainActivity extends Activity {
     }
 
     /********************* Private methods *****************************/
+
+    private void showAboutDialog() {
+	final Dialog dialog = new Dialog(this);
+	dialog.setContentView(R.layout.about_dialog);
+	dialog.setTitle(R.string.app_name);
+	TextView txtVersion = (TextView)dialog.findViewById(R.id.txtVersion);
+	String appName = getResources().getString(R.string.app_name);
+	String appVersion = getResources().getString(R.string.app_version);
+	txtVersion.setText(String.format("%s v.%s", appName, appVersion));
+	Button btnClose = (Button) dialog.findViewById(R.id.btnClose);	
+	btnClose.setOnClickListener(new OnClickListener() {
+	    @Override
+	    public void onClick(View btn) {
+		dialog.dismiss();
+	    }});
+	dialog.setCancelable(true);
+	dialog.show();
+    }
 
     private static final void setVolumeAngle(RobotService service, int angle) {
 	if (service != null) {
