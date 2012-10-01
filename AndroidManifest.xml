@@ -1,12 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.tartakynov.robotnoise"
-    android:versionCode="1"
+    android:versionCode="2"
     android:versionName="@string/app_name" >
 
     <uses-sdk
         android:minSdkVersion="8"
         android:targetSdkVersion="15" />
-
+    
+    <uses-feature android:name="android.hardware.sensor.accelerometer" android:required="true" />
+    <uses-feature android:name="android.hardware.sensor.proximity" android:required="true" />
+    <uses-feature android:name="android.hardware.touchscreen" android:required="true" />
+    
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.INTERNET" />
