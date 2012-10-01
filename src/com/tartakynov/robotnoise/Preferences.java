@@ -68,5 +68,14 @@ public class Preferences implements OnSharedPreferenceChangeListener {
 	    mEdit.putInt("angle", angle);		
 	    mEdit.commit();				
 	}
-    }        
+    }
+
+    public boolean isFeedbackRequested() {
+	return mPref.getBoolean("feedbackRequested", false);
+    }
+
+    public void setFeedbackRequested() {
+	mEdit.putBoolean("feedbackRequested", true);		
+	mEdit.commit();					
+    }
 }
