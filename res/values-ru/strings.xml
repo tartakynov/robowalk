@@ -7,6 +7,8 @@
     <string name="menu_about">О приложении</string>
     <string name="menu_quit">Выход</string>
     <string name="about_label">Автор: Артем Тартакынов\nИконки: Mattahan (Paul Davey)</string>
+    <string name="feedback_title">Обратная связь</string>
+    <string name="feedback_label">Спасибо за использование Mechanicus. Я буду признателен, если вы оставите свой отзыв в Google Play. Спасибо!</string>    
     <string name="robot_service_text">Механические звуки во время ходьбы</string>
     <string name="robot_power_on">Теперь положите телефон в карман</string>
     <string name="flurry">8J3WG7NC5BG9VH2RV5ZS</string>

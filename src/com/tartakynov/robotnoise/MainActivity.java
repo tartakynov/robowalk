@@ -5,6 +5,7 @@ import com.flurry.android.FlurryAgent;
 import com.tartakynov.robotnoise.Preferences.OnPreferenceChangeListener;
 import com.tartakynov.robotnoise.VolumeCircleView.ICircleAngleChanged;
 
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.os.Vibrator;
@@ -12,8 +13,11 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ApplicationInfo;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -78,7 +82,12 @@ public class MainActivity extends Activity {
 	{
 	case R.id.menu_quit: // MENU QUIT
 	    doStopService();
-	    finish();        
+	    if (mPreferences.isFeedbackRequested() && !isDebuggable()) {
+		finish();        
+	    } else {
+		showFeedbackDialog();
+		mPreferences.setFeedbackRequested();
+	    }
 	    break;
 	case R.id.menu_about: // MENU ABOUT
 	    showAboutDialog();
@@ -199,16 +208,13 @@ public class MainActivity extends Activity {
     /********************* Working with Analytics **********************/
 
     private void startAnalyticsSession() {
-	boolean gaEnabled = getResources().getBoolean(R.bool.ga_enabled);
-	boolean flurryEnabled = getResources().getBoolean(R.bool.flurry_enabled);
-	if (gaEnabled) {	    
+	if (!isDebuggable()) {	    
 	    mGATracker = GoogleAnalyticsTracker.getInstance(); 
 	    mGATracker.startNewSession(getResources().getString(R.string.ganalytics), this);
 	    mGATracker.trackPageView("/MainActivity");
-	}
-	if (flurryEnabled) {
 	    FlurryAgent.onStartSession(this, getResources().getString(R.string.flurry));	    
-	}	
+	    Log.i(LOG_TAG, "Started analytics sessions");
+	}
     }
 
     private void stopAnalyticsSession() {
@@ -237,6 +243,33 @@ public class MainActivity extends Activity {
 	    }});
 	dialog.setCancelable(true);
 	dialog.show();
+    }
+
+    private void showFeedbackDialog() {
+	final Dialog dialog = new Dialog(this);
+	dialog.setContentView(R.layout.feedback_dialog);
+	dialog.setTitle(R.string.feedback_title);
+	Button btnClose = (Button) dialog.findViewById(R.id.btnFeedback);	
+	btnClose.setOnClickListener(new OnClickListener() {
+	    @Override
+	    public void onClick(View btn) {
+		Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.tartakynov.robotnoise"));
+		startActivity(browserIntent);
+		dialog.dismiss();
+	    }
+	});
+	dialog.setOnDismissListener(new OnDismissListener() {
+	    @Override
+	    public void onDismiss(DialogInterface arg0) {
+		finish();
+	    }	    
+	});
+	dialog.setCancelable(true);
+	dialog.show();
+    }
+
+    private boolean isDebuggable() {
+	return ( 0 != ( getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE ) );
     }
 
     private static final void setVolumeAngle(RobotService service, int angle) {
