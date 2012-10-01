@@ -1,7 +1,7 @@
 <resources>
 
     <string name="app_name">Mechanicus</string>
-    <string name="app_version">1.0</string>
+    <string name="app_version">1.0.1</string>
     <string name="title_activity_main">Mechanicus</string>
     <string name="robot_service_label">Mechanicus</string>
     <string name="menu_about">О приложении</string>
