@@ -267,20 +267,26 @@ public class MainActivity extends Activity {
 	dialog.setCancelable(true);
 	dialog.show();
     }
-
+        
+    /**
+     * Check if application in debug mode
+     */
     private boolean isDebuggable() {
 	return ( 0 != ( getApplicationInfo().flags &= ApplicationInfo.FLAG_DEBUGGABLE ) );
     }
 
+    /**
+     * Set application volume by angle of potentiometer
+     */
     private static final void setVolumeAngle(RobotService service, int angle) {
 	if (service != null) {
-	    float volume = map(360, 1, angle);
+	    float volume = map(360.0f, 1.0f, angle);
 	    service.setVolume(volume);	    
 	}
     }
 
     /**
-     * Maps integer value from one range to another
+     * Maps value from one range to another
      */
     private static final float map(float maxFrom, float maxTo, float value) {
 	return value * (maxTo / maxFrom);
